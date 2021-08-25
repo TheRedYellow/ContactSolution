@@ -1,0 +1,200 @@
+﻿@page
+@model Contacts.Pages.IndexModel
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@{
+}
+
+@section header{
+
+   
+}
+
+
+@Html.AntiForgeryToken()
+
+<div class="container-fluid">
+
+
+    <p class="note note-primary mt-3">Aşağıdaki formdan contact listinizi oluşturabilirsiniz</p>
+    <p class="note note-secondary mb-0">Girdiğiniz hiçbir bilgi, izniniz dışında, 3. parti kişi veya kurumlarla paylaşılmayacaktır. </p>
+
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title">Genel bilgiler</h5>
+                    <div class="form-outline mt-3 mb-4">
+                        <input type="text" class="form-control" id="name">
+                        <label for="name" class="form-label">Ad /Soyad</label>
+                    </div>
+                    <div class="form-outline mb-4 col-4 col-md-2">
+                        <input type="number" id="age" class="form-control" />
+                        <label class="form-label" for="age">Yaş</label>
+                    </div>
+
+                    <div class="form-outline mb-4">
+                        <input type="text" class="form-control" id="occupation">
+                        <label for="occupation" class="form-label">Meslek</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    
+
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title">İletişim bilgileri</h5>
+                    <div class="form-outline mt-3 mb-4">
+                        <input type="email" class="form-control" id="email">
+                        <label for="email" class="form-label">E-posta adresi</label>
+                    </div>
+                    <div class="">
+                        <label for="phone" class="form-label d-block">Cep telefonu</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="Cep #">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      
+
+   
+
+    <div class="row mt-4 mb-5">
+        <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 mx-auto">
+                <button type="button" class="btn btn-secondary w-100" id="btnSend">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    
+   
+
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
+    <script>
+        var t = document.querySelector("input[name='__RequestVerificationToken']");
+        var csrftoken = t.value;
+
+    </script>
+ 
+
+    <script>
+
+        function show_alert(message) {
+            const alert = document.createElement('div');
+
+            alert.innerHTML = `
+                              <div class="d-flex justify-content-between">
+                                <p class="mb-0">${message}</p>
+                                <button
+                                  type="button"
+                                  class="btn-close"
+                                  data-mdb-dismiss="alert"
+                                  aria-label="Close"
+                                ></button>
+                              </div>
+                              `;
+            alert.classList.add('alert', 'fade');
+
+            document.body.appendChild(alert);
+
+            const alertInstance = new mdb.Alert(alert, {
+                color: "danger",
+                stacking: true,
+                hidden: true,
+                width: '350px',
+                position: 'top-center',
+                autohide: true,
+                delay: 7500,
+            });
+
+            alertInstance.show();
+        }
+
+        const btnSend = document.getElementById("btnSend");
+        btnSend.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+
+
+            //General info
+            const name = document.getElementById("name");
+            const age = document.getElementById("age");
+            const occupation = document.getElementById("occupation");
+
+
+           
+
+            //contact info
+            const email = document.getElementById("email");
+            const phone = document.getElementById("phone");
+            if (phone.value == "") {
+                show_alert("Lütfen cep telefon numaranızı giriniz");
+                return;
+            }
+
+
+          
+
+            var payload = {
+                name: null,
+                age: null,
+                occupation: null
+            };
+
+
+            payload.name = name.value;
+            payload.age = age.value;
+            payload.occupation = occupation.value;
+           
+            payload.email = email.value;
+            payload.phone = phone;
+           
+
+            $.ajax({
+                type: 'POST',
+                headers: {
+                    "X-CSRF-TOKEN": csrftoken
+                },
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (result) {
+                    if (result.error != undefined) {
+
+                        return;
+                    }
+
+                    if (typeof callback === "function") { callback(result); }
+                },
+                failure: function (response) {
+
+                },
+                error: function (response) {
+
+                }
+            });
+
+
+        });
+
+    </script>
+}
